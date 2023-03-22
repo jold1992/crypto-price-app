@@ -1,11 +1,36 @@
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const initialValues = {
+	name: "",
+	usd: 0,
+	usd_24h_vol: 0,
+};
+
 export default function Home() {
+	const [coins, setCoins] = useState([initialValues]);
+
+	useEffect(() => {
+		fetch(
+			"https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Ctether%2Cethereum%2Clitecoin%2Ccardano%2Cdogecoin&vs_currencies=usd&include_24hr_vol=true",
+		)
+			.then((res) => res.json())
+			.then((json) => {
+				const names = Object.getOwnPropertyNames(json);
+				let aux = [];
+
+				for (let name of names) {
+					aux.push({ name, ...json[name] });
+				}
+
+				setCoins(aux);
+			});
+	}, []);
+
 	return (
 		<>
 			<Head>
@@ -17,6 +42,15 @@ export default function Home() {
 			<main className="flex flex-col items-center">
 				<div className="py-8">
 					<h1>Crypto Price App</h1>
+					{coins.map((coin) => {
+						return (
+							<div>
+								<p>{coin.name}</p>
+								<p>{coin.usd}</p>
+								<p>{coin.usd_24h_vol.toFixed(5)}</p>
+							</div>
+						);
+					})}
 				</div>
 			</main>
 		</>
