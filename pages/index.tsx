@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 const initialValues = {
 	name: "",
 	usd: 0,
-	usd_24h_vol: 0,
+	usd_24h_change: 0,
 };
 
 export default function Home() {
@@ -16,7 +16,7 @@ export default function Home() {
 
 	useEffect(() => {
 		fetch(
-			"https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Ctether%2Cethereum%2Clitecoin%2Ccardano%2Cdogecoin&vs_currencies=usd&include_24hr_vol=true",
+			"https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Ctether%2Cethereum%2Clitecoin%2Ccardano%2Cdogecoin&vs_currencies=usd&include_24hr_change=true",
 		)
 			.then((res) => res.json())
 			.then((json) => {
@@ -40,14 +40,43 @@ export default function Home() {
 				<link rel="icon" href="/favicon.svg" />
 			</Head>
 			<main className="flex flex-col items-center">
-				<div className="py-8">
-					<h1>Crypto Price App</h1>
+				<div className="py-20">
+					<h1 className="text-center text-white font-bold mb-5 text-[36px]">
+						Crypto Price App
+					</h1>
 					{coins.map((coin) => {
 						return (
-							<div>
-								<p>{coin.name}</p>
-								<p>{coin.usd}</p>
-								<p>{coin.usd_24h_vol.toFixed(5)}</p>
+							<div
+								className={`flex m-5 w-[460px] h-4/5 rounded ${
+									coin.usd_24h_change < 0
+										? "bg-gradient-to-r from-[#202022] to-[#aa444425] text-[#ff4040]"
+										: "bg-gradient-to-r from-[#202022] to-[#4eb64510] text-[#30ff20]"
+								}`}
+								key={coin.name}
+							>
+								<div className="w-[80px] h-full grid place-items-center">
+									<img
+										className="h-[70%]"
+										src={`images/${coin.name}.png`}
+										alt=""
+									/>
+								</div>
+								<div className="h-full flex flex-col justify-start">
+									<h3 className="text-white text-[26px] uppercase">
+										{coin.name}
+									</h3>
+									<span className="text-[#aaa] text-[14px] font-medium">
+										/USD
+									</span>
+								</div>
+								<div className="grid items-center ml-auto pt-[8px] pr-[22px] text-right">
+									<span className="text-[26px] font-bold mt-[-6px]">
+										${coin.usd}
+									</span>
+									<span className="text-[#aaa] text-base font-semibold mt-[-30px]">
+										${coin.usd_24h_change.toFixed(5)}
+									</span>
+								</div>
 							</div>
 						);
 					})}
